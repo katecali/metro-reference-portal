@@ -26,36 +26,3 @@ npm run preview
 ```
 
 Output folder: `dist/`
-
-## Deploy (free)
-
-### Vercel
-1. Push this repo to GitHub
-2. Import into Vercel
-3. Settings:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-
-`vercel.json` already includes SPA rewrites.
-
-### Netlify
-1. New site from Git
-2. Settings:
-   - Build Command: `npm run build`
-   - Publish Directory: `dist`
-
-`netlify.toml` + `public/_redirects` already handle SPA routing.
-
-### Cloudflare Pages
-1. Create a Pages project connected to your GitHub repo
-2. Settings:
-   - Framework preset: Vite
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-
-`public/_redirects` works for SPA fallback.
-
-## Data updates
-Edit data in:
-- `src/data/codes.ts`
-

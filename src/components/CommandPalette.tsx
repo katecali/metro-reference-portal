@@ -9,9 +9,32 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Languages, ShieldAlert, Gauge, BookOpen, Settings } from "lucide-react";
+import {
+  Building2,
+  Radio,
+  Languages,
+  ShieldAlert,
+  Gauge,
+  BookOpen,
+  FileText,
+  ClipboardCheck,
+  Gavel,
+  Users,
+  Settings,
+} from "lucide-react";
 
-type TabKey = "radio" | "nato" | "penal" | "speed" | "reference" | "settings";
+type TabKey =
+  | "metropd"
+  | "radio"
+  | "nato"
+  | "penal"
+  | "speed"
+  | "reference"
+  | "sop"
+  | "promotions"
+  | "punishment"
+  | "roster"
+  | "settings";
 
 type Props = {
   open: boolean;
@@ -40,11 +63,14 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Props
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Search the portal… (radio, penal, speed, miranda, etc.)" />
+      <CommandInput placeholder="Search the portal… (metropd, sop, roster, radio, etc.)" />
       <CommandList>
         <CommandEmpty>No results.</CommandEmpty>
 
         <CommandGroup heading="Navigate">
+          <CommandItem onSelect={() => go("metropd")}>
+            <Building2 className="mr-2 h-4 w-4" /> MetroPD Command <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
+          </CommandItem>
           <CommandItem onSelect={() => go("radio")}>
             <Radio className="mr-2 h-4 w-4" /> Radio Codes <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
           </CommandItem>
@@ -59,6 +85,18 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Props
           </CommandItem>
           <CommandItem onSelect={() => go("reference")}>
             <BookOpen className="mr-2 h-4 w-4" /> Quick Reference <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
+          </CommandItem>
+          <CommandItem onSelect={() => go("sop")}>
+            <FileText className="mr-2 h-4 w-4" /> SOP <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
+          </CommandItem>
+          <CommandItem onSelect={() => go("promotions")}>
+            <ClipboardCheck className="mr-2 h-4 w-4" /> Promotions <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
+          </CommandItem>
+          <CommandItem onSelect={() => go("punishment")}>
+            <Gavel className="mr-2 h-4 w-4" /> Punishment Matrix <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
+          </CommandItem>
+          <CommandItem onSelect={() => go("roster")}>
+            <Users className="mr-2 h-4 w-4" /> Roster <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
           </CommandItem>
           <CommandItem onSelect={() => go("settings")}>
             <Settings className="mr-2 h-4 w-4" /> Settings <Badge variant="outline" className="ml-auto font-mono">tab</Badge>

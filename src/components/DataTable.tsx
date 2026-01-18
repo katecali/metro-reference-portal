@@ -41,6 +41,16 @@ export function DataTable<T extends Record<string, any>>({
     return "bg-muted text-muted-foreground border-border";
   };
 
+  const getCategoryStyle = (val: string) => {
+    const lower = val.toLowerCase();
+    if (lower === "emergency") return "bg-red-500/15 text-red-300 border-red-500/40";
+    if (lower === "status") return "bg-blue-500/15 text-blue-300 border-blue-500/40";
+    if (lower === "traffic") return "bg-amber-500/15 text-amber-300 border-amber-500/40";
+    if (lower === "medical") return "bg-emerald-500/15 text-emerald-300 border-emerald-500/40";
+    if (lower === "tactical") return "bg-purple-500/15 text-purple-300 border-purple-500/40";
+    return "bg-muted text-muted-foreground border-border";
+  };
+
   return (
     <div className="space-y-4 h-full flex flex-col">
       <div className="flex flex-col md:flex-row md:items-center gap-4 bg-card p-4 rounded-lg border border-border/50 shadow-sm">
@@ -90,8 +100,12 @@ export function DataTable<T extends Record<string, any>>({
                         key={String(col.accessorKey)}
                         className={`py-4 px-4 ${col.className}`}
                       >
-                        {col.accessorKey === 'color' && row[col.accessorKey] ? (
+                        {col.accessorKey === "color" && row[col.accessorKey] ? (
                           <span className={`px-2 py-1 rounded text-xs font-bold border ${getBadgeColor(row[col.accessorKey])}`}>
+                            {row[col.accessorKey]}
+                          </span>
+                        ) : col.accessorKey === "category" && row[col.accessorKey] ? (
+                          <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${getCategoryStyle(row[col.accessorKey])}`}>
                             {row[col.accessorKey]}
                           </span>
                         ) : (

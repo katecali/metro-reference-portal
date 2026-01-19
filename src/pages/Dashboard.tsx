@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/DataTable";
 import PenalCodesView from "@/pages/PenalCodesView";
@@ -13,12 +13,34 @@ import {
   Gauge,
   BookOpen,
   Settings,
-  Clock,
   Search,
+  FileText,
+  ClipboardCheck,
+  Gavel,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-type TabKey = "radio" | "nato" | "penal" | "speed" | "reference" | "settings";
+type TabKey =
+  | "radio"
+  | "nato"
+  | "penal"
+  | "speed"
+  | "reference"
+  | "sop"
+  | "promotions"
+  | "punishment"
+  | "roster"
+  | "settings";
+
+type DashboardProps = {
+  user: {
+    name: string;
+    callsign: string;
+  };
+  onLogout: () => void;
+};
 
 function getQueryParam(key: string): string | null {
   const params = new URLSearchParams(window.location.search);
@@ -36,11 +58,10 @@ function setQueryParams(next: Record<string, string | null>) {
   window.history.replaceState({}, "", url);
 }
 
-export default function Dashboard() {
-  const [tab, setTab] = useState<TabKey>("radio");
+export default function Dashboard({ user, onLogout }: DashboardProps) {
+  const [tab, setTab] = useState<TabKey>("reference");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLargeText, setIsLargeText] = useState(false);
-  const [now, setNow] = useState(new Date());
   const [commandOpen, setCommandOpen] = useState(false);
 
   useEffect(() => {
@@ -52,11 +73,6 @@ export default function Dashboard() {
     setQueryParams({ tab });
   }, [tab]);
 
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
   // Allow Command Palette to jump to a tab + optionally prefill search.
   const handleNavigate = (nextTab: TabKey, search?: string) => {
     setTab(nextTab);
@@ -64,9 +80,41 @@ export default function Dashboard() {
     else setQueryParams({ tab: nextTab });
   };
 
-  const headerClock = useMemo(
-    () => now.toLocaleTimeString([], { hour12: false }),
-    [now],
+  const DocumentPanel = ({
+    title,
+    description,
+    url,
+  }: {
+    title: string;
+    description: string;
+    url: string;
+  }) => (
+    <div className="flex-1 overflow-hidden flex flex-col gap-3">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-black uppercase tracking-widest text-primary">{title}</h2>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="uppercase tracking-widest text-xs"
+        >
+          <a href={url} target="_blank" rel="noreferrer">
+            Open in New Tab
+          </a>
+        </Button>
+      </div>
+      <div className="flex-1 rounded-lg overflow-hidden border border-border/60 bg-card/60 shadow-inner">
+        <iframe
+          title={title}
+          src={url}
+          className="h-full w-full"
+          loading="lazy"
+        />
+      </div>
+    </div>
   );
 
   return (
@@ -90,13 +138,15 @@ export default function Dashboard() {
             className="h-10 w-10 object-contain"
           />
           <div>
-            <h1 className="text-lg md:text-xl font-black tracking-widest uppercase leading-none">
-              METRO <span className="text-primary">REFERENCE</span> PORTAL
+            <h1 className="text-lg md:text-xl font-black tracking-[0.3em] uppercase leading-none">
+              METROPD <span className="text-primary">REFERENCE</span> BUREAU
             </h1>
             <div className="flex items-center gap-2 mt-1">
-              <Clock className="h-3 w-3 text-muted-foreground" />
+              <Badge variant="secondary" className="text-[10px] font-mono tracking-widest">
+                {user.callsign}
+              </Badge>
               <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">
-                {headerClock} • Quick Search: <span className="text-foreground/80">Ctrl/⌘ + K</span>
+                {user.name} • Quick Search: <span className="text-foreground/80">Ctrl/⌘ + K</span>
               </p>
             </div>
           </div>
@@ -130,6 +180,15 @@ export default function Dashboard() {
           >
             Text
           </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onLogout}
+            className="font-bold uppercase tracking-widest text-[10px]"
+            title="End session"
+          >
+            Lock
+          </Button>
         </div>
       </header>
 
@@ -152,6 +211,18 @@ export default function Dashboard() {
             <TabsTrigger value="reference" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
               <BookOpen className="mr-2 h-4 w-4 hidden sm:block" /> Reference
             </TabsTrigger>
+            <TabsTrigger value="sop" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
+              <FileText className="mr-2 h-4 w-4 hidden sm:block" /> SOP
+            </TabsTrigger>
+            <TabsTrigger value="promotions" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
+              <ClipboardCheck className="mr-2 h-4 w-4 hidden sm:block" /> Promotions
+            </TabsTrigger>
+            <TabsTrigger value="punishment" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
+              <Gavel className="mr-2 h-4 w-4 hidden sm:block" /> Matrix
+            </TabsTrigger>
+            <TabsTrigger value="roster" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
+              <Users className="mr-2 h-4 w-4 hidden sm:block" /> Roster
+            </TabsTrigger>
             <TabsTrigger value="settings" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
               <Settings className="mr-2 h-4 w-4 hidden sm:block" /> Settings
             </TabsTrigger>
@@ -163,9 +234,10 @@ export default function Dashboard() {
               columns={[
                 { header: "Code", accessorKey: "code", className: "w-[120px] font-mono text-primary font-bold" },
                 { header: "Description", accessorKey: "description", className: "font-medium" },
+                { header: "Category", accessorKey: "category", className: "w-[160px]" },
               ]}
-              searchKeys={["code", "description"]}
-              title="Radio Codes"
+              searchKeys={["code", "description", "category"]}
+              title="MetroPD Radio Codes"
             />
           </TabsContent>
 
@@ -200,6 +272,38 @@ export default function Dashboard() {
 
           <TabsContent value="reference" className="flex-1 overflow-auto data-[state=active]:block mt-0 border-none outline-none">
             <ReferenceCenter />
+          </TabsContent>
+
+          <TabsContent value="sop" className="flex-1 overflow-hidden data-[state=active]:flex flex-col mt-0 border-none outline-none">
+            <DocumentPanel
+              title="MetroPD Standard Operating Procedures"
+              description="SOP guidelines for field operations, communications, and administrative flow."
+              url="https://docs.google.com/document/d/1_O-bqBAZhEWvP19I4iKbh0KRqVc1_Ihm5KInKwgkZ-c/preview"
+            />
+          </TabsContent>
+
+          <TabsContent value="promotions" className="flex-1 overflow-hidden data-[state=active]:flex flex-col mt-0 border-none outline-none">
+            <DocumentPanel
+              title="Promotional Guidelines"
+              description="Promotion criteria, expectations, and review workflow."
+              url="https://docs.google.com/document/d/1g7U3-DsS3ybuOSSKJVfdi8LIEQCzf-G4WOiiaTnnbhQ/preview"
+            />
+          </TabsContent>
+
+          <TabsContent value="punishment" className="flex-1 overflow-hidden data-[state=active]:flex flex-col mt-0 border-none outline-none">
+            <DocumentPanel
+              title="Punishment Matrix"
+              description="Disciplinary matrix and recommended actions by infraction level."
+              url="https://docs.google.com/spreadsheets/d/18Io5OdkKsZ9aVDh8I5nsAPjBUISGGM77461K06ziALU/preview"
+            />
+          </TabsContent>
+
+          <TabsContent value="roster" className="flex-1 overflow-hidden data-[state=active]:flex flex-col mt-0 border-none outline-none">
+            <DocumentPanel
+              title="MetroPD Roster"
+              description="Live roster view for active command staff and sworn personnel."
+              url="https://docs.google.com/spreadsheets/d/1bJfy9jTbIuNNVVoqV7xaqtYsjIcV0CgCPRwUst6i0W8/preview"
+            />
           </TabsContent>
 
           <TabsContent value="settings" className="flex-1 overflow-auto data-[state=active]:block mt-0 border-none outline-none">

@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/DataTable";
 import PenalCodesView from "@/pages/PenalCodesView";
-import MetroPDOverview from "@/pages/MetroPDOverview";
 import ReferenceCenter from "@/pages/ReferenceCenter";
 import SettingsPanel from "@/pages/SettingsPanel";
 import CommandPalette from "@/components/CommandPalette";
@@ -14,18 +13,16 @@ import {
   Gauge,
   BookOpen,
   Settings,
-  Clock,
   Search,
   FileText,
   ClipboardCheck,
   Gavel,
   Users,
-  Building2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type TabKey =
-  | "metropd"
   | "radio"
   | "nato"
   | "penal"
@@ -36,6 +33,14 @@ type TabKey =
   | "punishment"
   | "roster"
   | "settings";
+
+type DashboardProps = {
+  user: {
+    name: string;
+    callsign: string;
+  };
+  onLogout: () => void;
+};
 
 function getQueryParam(key: string): string | null {
   const params = new URLSearchParams(window.location.search);
@@ -53,11 +58,10 @@ function setQueryParams(next: Record<string, string | null>) {
   window.history.replaceState({}, "", url);
 }
 
-export default function Dashboard() {
-  const [tab, setTab] = useState<TabKey>("metropd");
+export default function Dashboard({ user, onLogout }: DashboardProps) {
+  const [tab, setTab] = useState<TabKey>("reference");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLargeText, setIsLargeText] = useState(false);
-  const [now, setNow] = useState(new Date());
   const [commandOpen, setCommandOpen] = useState(false);
 
   useEffect(() => {
@@ -69,22 +73,12 @@ export default function Dashboard() {
     setQueryParams({ tab });
   }, [tab]);
 
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
   // Allow Command Palette to jump to a tab + optionally prefill search.
   const handleNavigate = (nextTab: TabKey, search?: string) => {
     setTab(nextTab);
     if (search) setQueryParams({ tab: nextTab, q: search });
     else setQueryParams({ tab: nextTab });
   };
-
-  const headerClock = useMemo(
-    () => now.toLocaleTimeString([], { hour12: false }),
-    [now],
-  );
 
   const DocumentPanel = ({
     title,
@@ -145,12 +139,14 @@ export default function Dashboard() {
           />
           <div>
             <h1 className="text-lg md:text-xl font-black tracking-[0.3em] uppercase leading-none">
-              METROPD <span className="text-primary">COMMAND</span> CENTER
+              METROPD <span className="text-primary">REFERENCE</span> BUREAU
             </h1>
             <div className="flex items-center gap-2 mt-1">
-              <Clock className="h-3 w-3 text-muted-foreground" />
+              <Badge variant="secondary" className="text-[10px] font-mono tracking-widest">
+                {user.callsign}
+              </Badge>
               <p className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">
-                {headerClock} • Dispatch Ready • Quick Search: <span className="text-foreground/80">Ctrl/⌘ + K</span>
+                {user.name} • Quick Search: <span className="text-foreground/80">Ctrl/⌘ + K</span>
               </p>
             </div>
           </div>
@@ -184,6 +180,15 @@ export default function Dashboard() {
           >
             Text
           </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onLogout}
+            className="font-bold uppercase tracking-widest text-[10px]"
+            title="End session"
+          >
+            Lock
+          </Button>
         </div>
       </header>
 
@@ -191,9 +196,6 @@ export default function Dashboard() {
       <main className="flex-1 overflow-hidden flex flex-col bg-[radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.03),transparent_40%)]">
         <Tabs value={tab} onValueChange={(v) => setTab(v as TabKey)} className="h-full flex flex-col p-2 md:p-4 gap-2">
           <TabsList className="h-12 md:h-14 w-full justify-start bg-card/50 border border-border/50 p-1 gap-1 overflow-x-auto shrink-0 no-scrollbar">
-            <TabsTrigger value="metropd" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
-              <Building2 className="mr-2 h-4 w-4 hidden sm:block" /> MetroPD
-            </TabsTrigger>
             <TabsTrigger value="radio" className="h-full px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold tracking-wide uppercase text-xs md:text-sm">
               <Radio className="mr-2 h-4 w-4 hidden sm:block" /> Radio
             </TabsTrigger>
@@ -225,10 +227,6 @@ export default function Dashboard() {
               <Settings className="mr-2 h-4 w-4 hidden sm:block" /> Settings
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="metropd" className="flex-1 overflow-hidden data-[state=active]:flex flex-col mt-0 border-none outline-none">
-            <MetroPDOverview />
-          </TabsContent>
 
           <TabsContent value="radio" className="flex-1 overflow-hidden data-[state=active]:flex flex-col mt-0 border-none outline-none">
             <DataTable

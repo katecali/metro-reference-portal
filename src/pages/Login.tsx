@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck } from "lucide-react";
-import logo from "@assets/1752618589758238-NEWMPDLOGOArtboard_1_1768622307273.png";
 
 interface LoginProps {
   onLogin: (data: { name: string; callsign: string }) => void;
@@ -36,14 +35,14 @@ export function Login({ onLogin }: LoginProps) {
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl relative z-10">
         <CardHeader className="space-y-4 items-center pb-8">
           <div className="h-24 w-24 relative">
-             <img src={logo} alt="Metro Police Logo" className="w-full h-full object-contain" />
+             <img src="/assets/metro-logo.png" alt="Metro Police Logo" className="w-full h-full object-contain" />
           </div>
           <div className="text-center space-y-1">
             <CardTitle className="text-2xl font-black tracking-tighter uppercase">
               Metro <span className="text-primary">Reference</span> Portal
             </CardTitle>
             <CardDescription className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground">
-              Departmental Access Required
+              Departmental Access Required • Session refresh every 2 hours
             </CardDescription>
           </div>
         </CardHeader>

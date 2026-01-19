@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import {
-  Building2,
   Radio,
   Languages,
   ShieldAlert,
@@ -24,7 +23,6 @@ import {
 } from "lucide-react";
 
 type TabKey =
-  | "metropd"
   | "radio"
   | "nato"
   | "penal"
@@ -63,14 +61,11 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Props
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Search the portal… (metropd, sop, roster, radio, etc.)" />
+      <CommandInput placeholder="Search the portal… (sop, roster, radio, etc.)" />
       <CommandList>
         <CommandEmpty>No results.</CommandEmpty>
 
         <CommandGroup heading="Navigate">
-          <CommandItem onSelect={() => go("metropd")}>
-            <Building2 className="mr-2 h-4 w-4" /> MetroPD Command <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
-          </CommandItem>
           <CommandItem onSelect={() => go("radio")}>
             <Radio className="mr-2 h-4 w-4" /> Radio Codes <Badge variant="outline" className="ml-auto font-mono">tab</Badge>
           </CommandItem>
